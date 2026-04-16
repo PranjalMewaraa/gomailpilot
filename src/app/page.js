@@ -131,7 +131,7 @@ const trustedBrands = [
   },
   {
     name: "Rank Brew",
-    src: "/rank-brew.png",
+    src: "/rank-brew-new.png",
   },
   {
     name: "Vrishaba",
@@ -139,7 +139,7 @@ const trustedBrands = [
   },
   {
     name: "TLG Gaming",
-    src: "/tlggaming.png",
+    src: "/tlggamingnew.webp",
   },
   {
     name: "VGAII",
@@ -1186,10 +1186,23 @@ export default function Home() {
               alt={`${brand.name} logo`}
               className="h-10 w-auto"
             />
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-base text-slate-500">
               Professional business email hosting by {brand.parent}.
             </p>
-            <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+            <a
+              href={`mailto:${brand.email}`}
+              className="mt-2 max-w-sm text-sm leading-6 text-slate-500"
+            >
+              {brand.email}
+            </a>
+            <br />
+            <a
+              href={`tel:${brand.phone.replace(/\s/g, "")}`}
+              className="mt-2 max-w-sm text-sm leading-6 text-slate-500"
+            >
+              {brand.phone}
+            </a>
+            <p className="mt-2 max-w-sm text-xs leading-6 text-slate-500">
               {brand.address}
             </p>
           </div>
@@ -1204,18 +1217,7 @@ export default function Home() {
             <a href="#support" className="transition hover:text-slate-950">
               Support
             </a>
-            <a
-              href={`mailto:${brand.email}`}
-              className="transition hover:text-slate-950"
-            >
-              {brand.email}
-            </a>
-            <a
-              href={`tel:${brand.phone.replace(/\s/g, "")}`}
-              className="transition hover:text-slate-950"
-            >
-              {brand.phone}
-            </a>
+
             <a
               href={brand.website}
               target="_blank"
