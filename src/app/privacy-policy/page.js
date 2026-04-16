@@ -1,7 +1,7 @@
 export const metadata = {
-  title: "Privacy Policy | Go Mail Pilot",
+  title: "Privacy Policy | A2z Mail Hosting",
   description:
-    "Read how Go Mail Pilot collects, uses, and protects customer information.",
+    "Read how A2z Mail Hosting collects, uses, and protects customer information.",
 };
 
 export default function PrivacyPolicyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
         <article className="mt-6 rounded-[2rem] border border-white/80 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-10">
           <p className="section-kicker">Legal</p>
           <h1 className="section-heading">Privacy Policy</h1>
-          <p className="mt-4 text-sm text-slate-500">Last updated: March 28, 2026</p>
+          <p className="mt-4 text-sm text-slate-500">Last updated: March 30, 2026</p>
 
           <div className="mt-8 space-y-8 text-sm leading-7 text-slate-600 sm:text-base">
             <section>
@@ -69,6 +69,19 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
+              <h2 className="text-xl font-bold text-slate-950">Backups and preservation</h2>
+              <p className="mt-3">
+                We perform service backups frequently, typically at intervals of up to 12 hours,
+                to support operational recovery and continuity. However, backups are provided as
+                a protective measure and not as an absolute guarantee of preservation,
+                availability, or full restoration in every circumstance. In rare cases, data may
+                be unavailable, incomplete, delayed, corrupted, or not recoverable due to
+                infrastructure failure, account misuse, third-party incidents, force majeure, or
+                other events outside reasonable operational control.
+              </p>
+            </section>
+
+            <section>
               <h2 className="text-xl font-bold text-slate-950">Your choices</h2>
               <p className="mt-3">
                 You can contact us to request account updates, corrections, or questions related
@@ -82,10 +95,10 @@ export default function PrivacyPolicyPage() {
               <p className="mt-3">
                 For privacy-related questions, contact{" "}
                 <a
-                  href="mailto:support@gomailpilot.com"
+                  href="mailto:info@a2zcloud.net"
                   className="font-semibold text-emerald-600"
                 >
-                  support@gomailpilot.com
+                  info@a2zcloud.net
                 </a>
                 .
               </p>

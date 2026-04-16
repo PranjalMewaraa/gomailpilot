@@ -1,7 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const brand = {
+  name: "A2z Mail Hosting",
+  parent: "A2z Cloud",
+  logo: "https://www.a2zcloud.net/wp-content/uploads/2024/11/logo.png",
+  email: "info@a2zcloud.net",
+  phone: "+91 8766346052",
+  whatsapp: "https://wa.me/918766346052",
+  website: "https://a2zcloud.net",
+  domain: "mailmaster.a2zcloud.net",
+  address: "Hig 6A, Shastripuram Sikandra Agra 282007, India",
+  refundPolicy: "https://www.a2zcloud.net/refund-policy/",
+  privacyPolicy: "https://www.a2zcloud.net/privacy-policy/",
+  paymentButtonId: "pl_SdL4Fbmt8t2cu9",
+};
 
 const plans = [
   {
@@ -85,9 +100,15 @@ const featureCards = [
     icon: <ForwardIcon />,
   },
   {
+    title: "Higher Sending Limits",
+    description:
+      "Need more sending volume? Dedicated IP upgrades are available with additional charges.",
+    icon: <BoltIcon />,
+  },
+  {
     title: "Human Support",
     description:
-      "Ticket and email support with quick help from real people, not bots.",
+      "Ticket, email, and WhatsApp support with real people for custom solutions and scaling needs.",
     icon: <SupportIcon />,
   },
 ];
@@ -128,6 +149,10 @@ const trustedBrands = [
     name: "Gurutmaan",
     src: "/gurutmaan.png",
   },
+  {
+    name: "Creditmaster",
+    src: "/creditmaster.png",
+  },
 ];
 
 const comparisons = [
@@ -153,13 +178,45 @@ const comparisons = [
   },
 ];
 
+const infrastructure = [
+  {
+    title: "Datacenter",
+    description: "Brussels, Belgium",
+  },
+  {
+    title: "Network Provider",
+    description: "ANEXIA Internetdienstleistungs GmbH",
+  },
+  {
+    title: "Enterprise-Grade Security",
+    description: "Built for secure, professional business email operations.",
+  },
+  {
+    title: "Redundant Power & Network",
+    description: "Designed for dependable uptime and business continuity.",
+  },
+];
+
+const guarantees = [
+  "99.9% Uptime SLA",
+  "30-Day Money Back",
+  "Free Migration Service",
+  "24/7 Technical Support",
+];
+
 export default function Home() {
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [hasScrolled, setHasScrolled] = useState(false);
-  const [supportForm, setSupportForm] = useState({
+  const [registrationForm, setRegistrationForm] = useState({
     name: "",
     email: "",
-    company: "",
+    mobile: "",
+    plan: "Growth",
+    domain: "",
+    description: "",
+  });
+  const [registrationStatus, setRegistrationStatus] = useState({
+    type: "idle",
     message: "",
   });
 
@@ -176,29 +233,60 @@ export default function Home() {
     };
   }, []);
 
-  const handleSupportChange = (event) => {
+  const handleRegistrationChange = (event) => {
     const { name, value } = event.target;
 
-    setSupportForm((current) => ({
+    setRegistrationForm((current) => ({
       ...current,
       [name]: value,
     }));
   };
 
-  const handleSupportSubmit = (event) => {
+  const handleRegistrationSubmit = async (event) => {
     event.preventDefault();
 
-    const subject = `Go Mail Pilot Support Query from ${supportForm.name || "Website Visitor"}`;
-    const body = [
-      `Name: ${supportForm.name || "-"}`,
-      `Email: ${supportForm.email || "-"}`,
-      `Company: ${supportForm.company || "-"}`,
-      "",
-      "Query:",
-      supportForm.message || "-",
-    ].join("\n");
+    setRegistrationStatus({
+      type: "loading",
+      message: "Submitting your consultation request...",
+    });
 
-    window.location.href = `mailto:support@gomailpilot.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    try {
+      const response = await fetch("/api/registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registrationForm),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || "Failed to submit registration request.",
+        );
+      }
+
+      setRegistrationStatus({
+        type: "success",
+        message: "Consultation request submitted. We’ll contact you shortly.",
+      });
+      setRegistrationForm({
+        name: "",
+        email: "",
+        mobile: "",
+        plan: "Growth",
+        domain: "",
+        description: "",
+      });
+    } catch (error) {
+      setRegistrationStatus({
+        type: "error",
+        message:
+          error.message ||
+          "Something went wrong while submitting your consultation request.",
+      });
+    }
   };
 
   return (
@@ -212,21 +300,16 @@ export default function Home() {
       >
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <a href="#top" className="flex items-center gap-3">
-            <Image
-              src="/width_308.webp"
-              alt="Go Mail Pilot logo"
-              width={144}
-              height={42}
-              priority
+            <img
+              src={brand.logo}
+              alt={`${brand.name} logo`}
               className="h-9 w-auto sm:h-10"
             />
             <div>
               <p className="font-[family-name:var(--font-display)] text-lg font-extrabold leading-none">
-                Go Mail Pilot
+                {brand.name}
               </p>
-              <p className="text-xs text-slate-500">
-                Professional email hosting made simple
-              </p>
+              <p className="text-xs text-slate-500">by {brand.parent}</p>
             </div>
           </a>
 
@@ -250,7 +333,7 @@ export default function Home() {
               Talk to Support
             </a>
             <a
-              href="#plans"
+              href="#registration"
               className="rounded-full bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_36px_rgba(34,197,94,0.32)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(34,197,94,0.38)]"
             >
               Get Started
@@ -272,20 +355,23 @@ export default function Home() {
               </div>
 
               <h1 className="font-[family-name:var(--font-display)] text-5xl font-extrabold leading-[1.02] tracking-[-0.04em] text-slate-950 sm:text-6xl lg:text-7xl">
-                Professional Business Email Hosting That Just Works
+                Own Your Domain. Earn Their Trust.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
-                Secure, fast, and affordable email hosting with daily backups,
-                free SSL, and an easy control panel starting at just{" "}
+                Stop using @gmail.com for your business. Get secure,
+                enterprise-grade email with 24/7 WhatsApp support and daily
+                backups starting at just{" "}
                 <span className="font-bold text-emerald-600">₹249/month</span>.
+                Need higher sending limits or a dedicated IP? We also offer
+                custom upgrades for growing teams.
               </p>
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <a
-                  href="#plans"
+                  href="#registration"
                   className="inline-flex items-center justify-center rounded-full bg-[var(--color-accent)] px-7 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(34,197,94,0.28)] transition duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(34,197,94,0.36)]"
                 >
-                  Get Started
+                  Get Started Now - ₹249/mo
                 </a>
                 <a
                   href="#support"
@@ -298,11 +384,13 @@ export default function Home() {
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium text-slate-600">
                 <TrustItem label="No technical skills needed" />
                 <TrustItem label="Instant setup" />
-                <TrustItem label="99.9% uptime" />
+                <TrustItem label="99.9% Uptime Guarantee" />
+                <TrustItem label="30-Day Money Back" />
               </div>
 
               <p className="mt-5 text-sm font-medium text-slate-500">
-                Starting ₹249 only • No setup cost • Cancel anytime
+                Starting ₹249 only • No setup cost • Cancel anytime • Custom
+                solutions available
               </p>
             </div>
 
@@ -315,7 +403,7 @@ export default function Home() {
                       Inbox Overview
                     </p>
                     <p className="text-xs text-slate-500">
-                      pilot@yourbusiness.com
+                      info@yourbusiness.com
                     </p>
                   </div>
                   <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
@@ -354,7 +442,7 @@ export default function Home() {
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <StatCard value="99.9%" label="Uptime" />
                   <StatCard value="Daily" label="Backups" />
-                  <StatCard value="SSL" label="Included" />
+                  <StatCard value="24/7" label="Support" />
                 </div>
               </div>
             </div>
@@ -371,7 +459,8 @@ export default function Home() {
                 </h2>
                 <p className="section-copy">
                   Choose the plan that fits today and scale up when your team
-                  needs more storage, accounts, or forwarding capacity.
+                  needs more storage, accounts, forwarding capacity, or higher
+                  sending limits with a dedicated IP upgrade.
                 </p>
               </div>
 
@@ -454,8 +543,13 @@ export default function Home() {
                       ))}
                     </ul>
 
+                    <p className="mt-5 text-xs leading-6 text-slate-500">
+                      Higher sending limit with dedicated IP available on
+                      request. Charges applicable.
+                    </p>
+
                     <a
-                      href="#final-cta"
+                      href="#registration"
                       className={`mt-8 inline-flex justify-center rounded-full px-5 py-3 text-sm font-semibold transition duration-300 ease-in-out ${
                         plan.featured
                           ? "bg-[var(--color-accent)] text-white shadow-[0_18px_36px_rgba(34,197,94,0.28)] hover:-translate-y-0.5"
@@ -464,6 +558,12 @@ export default function Home() {
                     >
                       {plan.cta}
                     </a>
+                    <div className="mt-4 rounded-[1.25rem] border border-emerald-100 bg-emerald-50/60 p-3">
+                      <p className="mb-3 text-center text-xs font-semibold text-emerald-700">
+                        Pay now with Razorpay
+                      </p>
+                      <RazorpayPaymentButton />
+                    </div>
                   </article>
                 ))}
               </div>
@@ -471,10 +571,10 @@ export default function Home() {
 
             <div className="mt-8 flex justify-center">
               <a
-                href="#final-cta"
+                href="#registration"
                 className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-base font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5"
               >
-                Start Now - Instant Activation
+                Book Your Slot Now
               </a>
             </div>
           </div>
@@ -518,6 +618,52 @@ export default function Home() {
         </section>
 
         <section className="px-4 py-18 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+              <div>
+                <p className="section-kicker">Infrastructure</p>
+                <h2 className="section-heading">
+                  Enterprise-Grade Hosting Infrastructure
+                </h2>
+                <p className="section-copy">
+                  Your business email runs on a professional hosting stack with
+                  datacenter infrastructure in Brussels, Belgium and reliable
+                  network operations from ANEXIA Internetdienstleistungs GmbH.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {infrastructure.map((item) => (
+                  <div
+                    key={item.title}
+                    className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)]"
+                  >
+                    <CheckIcon />
+                    <h3 className="mt-4 text-lg font-bold text-slate-950">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-10 grid gap-4 rounded-[2rem] border border-emerald-100 bg-emerald-50/60 p-5 sm:grid-cols-2 lg:grid-cols-4">
+              {guarantees.map((guarantee) => (
+                <div
+                  key={guarantee}
+                  className="rounded-[1.25rem] bg-white px-5 py-4 text-sm font-bold text-slate-900 shadow-[0_12px_30px_rgba(15,23,42,0.05)]"
+                >
+                  {guarantee}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 py-18 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_1.05fr]">
             <div>
               <p className="section-kicker">Why Choose Us</p>
@@ -525,9 +671,10 @@ export default function Home() {
                 Why Pay ₹1500 When ₹249 Does the Job?
               </h2>
               <p className="section-copy">
-                Go Mail Pilot keeps the essentials front and center: reliable
+                A2z Mail Hosting keeps the essentials front and center: reliable
                 hosting, clean setup, and support that understands smaller
-                businesses.
+                businesses, while still offering custom solutions when your
+                requirements grow.
               </p>
 
               <ul className="mt-8 space-y-4 text-sm font-medium text-slate-700">
@@ -537,6 +684,7 @@ export default function Home() {
                   "Full control with no locked ecosystem",
                   "Faster support for small businesses",
                   "Affordable for startups and local businesses",
+                  "Custom solutions for more emails and higher sending needs",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <CheckIcon />
@@ -549,7 +697,7 @@ export default function Home() {
             <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
               <div className="grid grid-cols-3 border-b border-slate-200 bg-slate-50 px-6 py-4 text-sm font-semibold text-slate-500">
                 <span>Feature</span>
-                <span className="text-emerald-700">Go Mail Pilot</span>
+                <span className="text-emerald-700">A2z Mail Hosting</span>
                 <span>Them</span>
               </div>
               <div className="divide-y divide-slate-200">
@@ -600,26 +748,39 @@ export default function Home() {
 
             <div className="glass-panel rounded-[2rem] p-8">
               <div className="inline-flex rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
-                Professional identity in minutes
+                Set up your business email in under 5 minutes
               </div>
               <div className="mt-6 space-y-4">
                 {[
-                  "Connect your domain",
-                  "Create your mailboxes",
-                  "Start sending from a branded address",
+                  {
+                    title: "Connect your domain",
+                    description:
+                      "Easily link your domain with step-by-step DNS setup. No technical expertise required.",
+                  },
+                  {
+                    title: "Create your mailboxes",
+                    description:
+                      "Set up custom email addresses for your team in seconds (e.g. info@, sales@, support@).",
+                  },
+                  {
+                    title: "Start sending from a branded address",
+                    description:
+                      "Send and receive emails using your domain with reliable delivery and a professional identity.",
+                  },
                 ].map((step, index) => (
                   <div
-                    key={step}
+                    key={step.title}
                     className="flex items-start gap-4 rounded-2xl bg-white/88 p-4"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
+                    <div className="flex h-10 w-10 aspect-square items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
                       {index + 1}
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-950">{step}</p>
+                      <p className="font-semibold text-slate-950">
+                        {step.title}
+                      </p>
                       <p className="mt-1 text-sm text-slate-500">
-                        Clean onboarding designed for owners, freelancers, and
-                        lean teams.
+                        {step.description}
                       </p>
                     </div>
                   </div>
@@ -638,12 +799,13 @@ export default function Home() {
               </h2>
               <p className="mt-4 max-w-xl text-base leading-8 text-slate-300">
                 Fast issue resolution, human support, and practical help through
-                ticket and email whenever you need it.
+                ticket, email, and WhatsApp whenever you need it, including
+                custom solutions or more email accounts.
               </p>
 
               <div className="mt-8 flex items-center gap-4 rounded-[1.5rem] bg-white/8 p-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-xl font-black text-white">
-                  GP
+                  A2Z
                 </div>
                 <div>
                   <p className="text-lg font-bold">Support team online</p>
@@ -659,116 +821,117 @@ export default function Home() {
                 </p>
                 <div className="mt-4 space-y-3 text-sm text-slate-300">
                   <a
-                    href="mailto:support@gomailpilot.com"
+                    href={`mailto:${brand.email}`}
                     className="flex items-center justify-between rounded-2xl bg-white/6 px-4 py-3 transition hover:bg-white/10"
                   >
                     <span>Email support</span>
                     <span className="font-semibold text-white">
-                      support@gomailpilot.com
+                      {brand.email}
                     </span>
                   </a>
                   <a
-                    href="https://wa.me/918766346052"
+                    href={brand.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between rounded-2xl bg-white/6 px-4 py-3 transition hover:bg-white/10"
                   >
                     <span>WhatsApp support</span>
                     <span className="font-semibold text-white">
-                      +91 87663 46052
+                      {brand.phone}
                     </span>
                   </a>
                 </div>
+                <p className="mt-4 text-sm leading-6 text-slate-300">
+                  Contact now for custom solutions, more email accounts, or
+                  higher sending limits with dedicated IP options. 24/7 WhatsApp
+                  Support is available.
+                </p>
               </div>
             </div>
 
-            <form
-              onSubmit={handleSupportSubmit}
-              className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="section-kicker">Query Form</p>
-                  <h3 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-[-0.04em] text-slate-950">
-                    Send us your question
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-500">
-                    Fill this out and we&apos;ll open your email client with the
-                    full query, ready to send to our team.
-                  </p>
-                </div>
-                <div className="hidden rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 sm:inline-flex">
-                  Under 30 min avg.
-                </div>
-              </div>
-
-              <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                <FormField
-                  label="Your name"
-                  name="name"
-                  type="text"
-                  placeholder="Pranjal"
-                  value={supportForm.name}
-                  onChange={handleSupportChange}
-                />
-                <FormField
-                  label="Email address"
-                  name="email"
-                  type="email"
-                  placeholder="you@business.com"
-                  value={supportForm.email}
-                  onChange={handleSupportChange}
-                />
-                <FormField
-                  label="Company"
-                  name="company"
-                  type="text"
-                  placeholder="Your business name"
-                  value={supportForm.company}
-                  onChange={handleSupportChange}
-                />
-                <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm font-semibold text-slate-950">
-                    Need a faster route?
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-slate-500">
-                    For urgent setup help or pre-sales questions, tap the
-                    WhatsApp button and chat with us directly.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <label
-                  htmlFor="message"
-                  className="mb-2 block text-sm font-semibold text-slate-900"
-                >
-                  Your query
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="6"
-                  placeholder="Tell us what you need help with..."
-                  value={supportForm.message}
-                  onChange={handleSupportChange}
-                  className="w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:bg-white"
-                />
-              </div>
-
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm text-slate-500">
-                  Ticket support, email support, and WhatsApp assistance for
-                  quick queries.
+            <div className="grid gap-5">
+              <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+                <p className="section-kicker">Contact Sales</p>
+                <h3 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-[-0.04em] text-slate-950">
+                  Talk to us directly
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-slate-500">
+                  Need more email accounts, custom plans, higher sending limits,
+                  or dedicated IP options? Contact our team directly for the
+                  fastest response.
                 </p>
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(34,197,94,0.28)] transition hover:-translate-y-0.5"
-                >
-                  Send Query
-                </button>
+
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                  <a
+                    href={`mailto:${brand.email}`}
+                    className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-white"
+                  >
+                    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-600">
+                      Email
+                    </p>
+                    <p className="mt-3 text-lg font-bold text-slate-950">
+                      {brand.email}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                      Best for business queries, sales requests, and migration
+                      help.
+                    </p>
+                  </a>
+                  <a
+                    href={brand.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-white"
+                  >
+                    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-600">
+                      WhatsApp
+                    </p>
+                    <p className="mt-3 text-lg font-bold text-slate-950">
+                      {brand.phone}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                      24/7 WhatsApp support for quick help and urgent questions.
+                    </p>
+                  </a>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <a
+                    href={`mailto:${brand.email}`}
+                    className="inline-flex items-center justify-center rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(34,197,94,0.28)] transition hover:-translate-y-0.5"
+                  >
+                    Email Sales Team
+                  </a>
+                  <a
+                    href={brand.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:border-slate-900"
+                  >
+                    Chat on WhatsApp
+                  </a>
+                </div>
               </div>
-            </form>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                {[
+                  "24/7 WhatsApp Support",
+                  "Free Migration Service",
+                  "30-Day Money Back",
+                  "Custom solutions for growing teams",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]"
+                  >
+                    <CheckIcon />
+                    <p className="mt-4 text-lg font-semibold text-slate-950">
+                      {item}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -798,6 +961,195 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="registration" className="px-4 py-18 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="rounded-[2rem] bg-slate-950 p-8 text-white shadow-[0_26px_70px_rgba(15,23,42,0.16)]">
+              <p className="section-kicker !text-emerald-300">
+                Book a Consultation
+              </p>
+              <h2 className="mt-3 font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-[-0.04em]">
+                Book your consultation or demo today.
+              </h2>
+              <p className="mt-4 text-base leading-8 text-slate-300">
+                Tell us what you need and our team will reach out to help you
+                choose the right plan, discuss setup, and walk you through a
+                live demo if needed.
+              </p>
+              <p className="mt-4 rounded-2xl bg-white/8 px-4 py-3 text-sm font-semibold text-emerald-200">
+                Mail service domain: {brand.domain}
+              </p>
+
+              <div className="mt-8 rounded-[1.75rem] border border-emerald-400/20 bg-emerald-500/10 p-5">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">
+                  What we help with
+                </p>
+                <p className="mt-3 text-lg font-bold text-white">
+                  Plan selection, migration, demos, and custom business email
+                  setup
+                </p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Share your requirements and we&apos;ll guide you to the right
+                  plan, migration path, and any custom sending or mailbox needs.
+                </p>
+              </div>
+            </div>
+
+            <form
+              onSubmit={handleRegistrationSubmit}
+              className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="section-kicker">Consultation Form</p>
+                  <h3 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-[-0.04em] text-slate-950">
+                    Book your demo
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-500">
+                    Share your details and preferred plan. We&apos;ll contact
+                    you to discuss setup, demos, upgrades, or custom business
+                    requirements.
+                  </p>
+                </div>
+                <div className="hidden rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 sm:inline-flex">
+                  Demo bookings open
+                </div>
+              </div>
+
+              <div className="mt-8 grid gap-5 sm:grid-cols-2">
+                <FormField
+                  label="Name"
+                  name="name"
+                  type="text"
+                  placeholder="Your full name"
+                  value={registrationForm.name}
+                  onChange={handleRegistrationChange}
+                  required
+                />
+                <FormField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  placeholder="you@business.com"
+                  value={registrationForm.email}
+                  onChange={handleRegistrationChange}
+                  required
+                />
+                <FormField
+                  label="Mobile"
+                  name="mobile"
+                  type="tel"
+                  placeholder="+91 98765 43210"
+                  value={registrationForm.mobile}
+                  onChange={handleRegistrationChange}
+                  required
+                />
+                <div>
+                  <label
+                    htmlFor="plan"
+                    className="mb-2 block text-sm font-semibold text-slate-900"
+                  >
+                    Plan
+                  </label>
+                  <select
+                    id="plan"
+                    name="plan"
+                    value={registrationForm.plan}
+                    onChange={handleRegistrationChange}
+                    required
+                    className="w-full rounded-[1.25rem] border border-slate-200 bg-slate-50 px-5 py-3.5 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:bg-white"
+                  >
+                    {plans.map((plan) => (
+                      <option key={plan.name} value={plan.name}>
+                        {plan.name} - {plan.price}/month
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <FormField
+                  label="Domain"
+                  name="domain"
+                  type="text"
+                  placeholder="yourbusiness.com"
+                  value={registrationForm.domain}
+                  onChange={handleRegistrationChange}
+                  required
+                />
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="description"
+                  className="mb-2 block text-sm font-semibold text-slate-900"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  rows="4"
+                  placeholder="Tell us about your business email needs, number of mailboxes, or any custom requirements."
+                  value={registrationForm.description}
+                  onChange={handleRegistrationChange}
+                  className="w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:bg-white"
+                />
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-slate-500">
+                    Need more emails, migration help, or custom sending
+                    capacity? Mention it in the description and we&apos;ll cover
+                    it during the consultation.
+                  </p>
+                  <p className="mt-2 text-xs leading-6 text-slate-400">
+                    Backup notice: we perform backups frequently, typically
+                    every 12 hours, but restoration and preservation cannot be
+                    guaranteed 100% in rare exceptional cases. See our{" "}
+                    <a
+                      href={brand.privacyPolicy}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-emerald-600"
+                    >
+                      Privacy Policy
+                    </a>{" "}
+                    and{" "}
+                    <a href="/terms" className="font-semibold text-emerald-600">
+                      Terms
+                    </a>
+                    .
+                  </p>
+                  {registrationStatus.type !== "idle" ? (
+                    <p
+                      className={`mt-2 text-sm font-medium ${
+                        registrationStatus.type === "success"
+                          ? "text-emerald-600"
+                          : registrationStatus.type === "error"
+                            ? "text-red-600"
+                            : "text-slate-500"
+                      }`}
+                    >
+                      {registrationStatus.message}
+                    </p>
+                  ) : null}
+                </div>
+                <button
+                  type="submit"
+                  disabled={registrationStatus.type === "loading"}
+                  className="inline-flex items-center justify-center rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(34,197,94,0.28)] transition hover:-translate-y-0.5"
+                >
+                  {registrationStatus.type === "loading"
+                    ? "Submitting..."
+                    : "Book Consultation Now"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
         <section id="final-cta" className="px-4 pt-18 pb-28 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-6xl rounded-[2.5rem] bg-slate-950 px-6 py-10 text-center text-white shadow-[0_30px_90px_rgba(15,23,42,0.18)] sm:px-10 sm:py-14">
             <p className="section-kicker !text-emerald-300">Start Today</p>
@@ -805,20 +1157,21 @@ export default function Home() {
               Start Your Professional Email Today
             </h2>
             <p className="mt-4 text-base text-slate-300">
-              No setup cost • Instant activation • Cancel anytime
+              No setup cost • Instant activation • Cancel anytime • Contact now
+              for custom solutions or more emails
             </p>
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
               <a
-                href="#plans"
+                href="#registration"
                 className="inline-flex items-center justify-center rounded-full bg-[var(--color-accent)] px-7 py-4 text-base font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5"
               >
-                Get Started
+                Book Consultation Now
               </a>
               <a
-                href="#plans"
+                href="#support"
                 className="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-4 text-base font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5 hover:border-white/50"
               >
-                View Plans
+                Contact for Custom Solutions
               </a>
             </div>
           </div>
@@ -828,15 +1181,16 @@ export default function Home() {
       <footer className="border-t border-slate-200 bg-white px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <Image
-              src="/width_308.webp"
-              alt="Go Mail Pilot logo"
-              width={170}
-              height={50}
+            <img
+              src={brand.logo}
+              alt={`${brand.name} logo`}
               className="h-10 w-auto"
             />
             <p className="mt-2 text-sm text-slate-500">
-              Professional business email hosting that stays simple.
+              Professional business email hosting by {brand.parent}.
+            </p>
+            <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+              {brand.address}
             </p>
           </div>
 
@@ -851,37 +1205,61 @@ export default function Home() {
               Support
             </a>
             <a
-              href="mailto:support@gomailpilot.com"
+              href={`mailto:${brand.email}`}
               className="transition hover:text-slate-950"
             >
-              support@gomailpilot.com
+              {brand.email}
             </a>
-            <a href="/privacy-policy" className="transition hover:text-slate-950">
+            <a
+              href={`tel:${brand.phone.replace(/\s/g, "")}`}
+              className="transition hover:text-slate-950"
+            >
+              {brand.phone}
+            </a>
+            <a
+              href={brand.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-slate-950"
+            >
+              a2zcloud.net
+            </a>
+            <a
+              href={brand.privacyPolicy}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-slate-950"
+            >
               Privacy Policy
             </a>
-            <a href="/terms" className="transition hover:text-slate-950">
-              Terms
+            <a
+              href={brand.refundPolicy}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-slate-950"
+            >
+              Refund Policy
             </a>
           </div>
         </div>
         <div className="mx-auto mt-8 max-w-7xl text-sm text-slate-400">
-          © 2026 Go Mail Pilot. All rights reserved.
+          © 2026 {brand.name}. All rights reserved.
         </div>
       </footer>
 
       <a
-        href="#plans"
+        href="#registration"
         className={`fixed right-5 bottom-5 z-40 hidden rounded-full bg-[var(--color-accent)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(34,197,94,0.35)] transition duration-300 ease-in-out sm:inline-flex ${
           hasScrolled
             ? "translate-y-0 opacity-100"
             : "pointer-events-none translate-y-4 opacity-0"
         }`}
       >
-        Start at ₹249
+        Book ₹249 Plan
       </a>
 
       <a
-        href="https://wa.me/918766346052"
+        href={brand.whatsapp}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
@@ -899,7 +1277,7 @@ export default function Home() {
             <p className="text-sm font-bold text-slate-950">₹249/mo</p>
           </div>
           <a
-            href="#plans"
+            href="#registration"
             className="inline-flex rounded-full bg-[var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-white"
           >
             Get Started
@@ -908,7 +1286,7 @@ export default function Home() {
       </div>
 
       <a
-        href="https://wa.me/918766346052"
+        href={brand.whatsapp}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
@@ -920,7 +1298,15 @@ export default function Home() {
   );
 }
 
-function FormField({ label, name, type, placeholder, value, onChange }) {
+function FormField({
+  label,
+  name,
+  type,
+  placeholder,
+  value,
+  onChange,
+  required = false,
+}) {
   return (
     <div>
       <label
@@ -936,10 +1322,41 @@ function FormField({ label, name, type, placeholder, value, onChange }) {
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        required={required}
         className="w-full rounded-[1.25rem] border border-slate-200 bg-slate-50 px-5 py-3.5 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:bg-white"
       />
     </div>
   );
+}
+
+function RazorpayPaymentButton() {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    containerRef.current.innerHTML = "";
+
+    const form = document.createElement("form");
+    const script = document.createElement("script");
+
+    script.src = "https://checkout.razorpay.com/v1/payment-button.js";
+    script.async = true;
+    script.dataset.payment_button_id = brand.paymentButtonId;
+
+    form.appendChild(script);
+    containerRef.current.appendChild(form);
+
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
+    };
+  }, []);
+
+  return <div ref={containerRef} className="flex justify-center" />;
 }
 
 function TrustItem({ label }) {
@@ -1126,7 +1543,12 @@ function SupportIcon() {
 
 function WhatsAppIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill="currentColor"
+    >
       <path d="M19.05 4.94A9.9 9.9 0 0 0 12.03 2C6.55 2 2.08 6.46 2.08 11.95c0 1.76.46 3.47 1.34 4.99L2 22l5.22-1.37a9.92 9.92 0 0 0 4.75 1.21h.01c5.48 0 9.95-4.46 9.95-9.95 0-2.66-1.04-5.16-2.88-6.95Zm-7.02 15.22h-.01a8.26 8.26 0 0 1-4.2-1.15l-.3-.18-3.1.81.83-3.02-.2-.31a8.25 8.25 0 0 1-1.27-4.36c0-4.56 3.7-8.27 8.27-8.27 2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.42 5.84c0 4.56-3.71 8.27-8.27 8.27Zm4.53-6.2c-.25-.12-1.47-.73-1.7-.81-.23-.09-.39-.12-.56.12-.16.24-.64.81-.78.97-.14.16-.29.18-.54.06-.25-.13-1.04-.38-1.99-1.21-.74-.66-1.24-1.47-1.38-1.72-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.24-.84.82-.84 2 0 1.18.86 2.31.98 2.47.12.16 1.69 2.58 4.09 3.62.57.24 1.01.39 1.36.5.57.18 1.09.16 1.5.1.46-.07 1.47-.6 1.68-1.17.21-.58.21-1.07.15-1.17-.06-.1-.22-.16-.47-.28Z" />
     </svg>
   );
